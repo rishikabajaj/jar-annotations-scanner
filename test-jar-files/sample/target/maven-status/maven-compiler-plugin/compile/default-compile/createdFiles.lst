@@ -1,0 +1,5 @@
+com/demo/App.class
+com/demo/Example.class
+com/demo/AnnotatedClass.class
+com/demo/MyCustomAnnotation.class
+com/demo/CustomAnnotation.class
