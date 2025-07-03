@@ -8,38 +8,15 @@ JAR Annotation Scanner is a Java tool that scans any `.jar` file and detects usa
 
 ## Features
 
-* Scans `.jar` files for runtime annotations.
-* Supports detection at all three levels:
+* Scans `.jar` files for 3 types of annotations
     * Class-level annotations
     * Method-level annotations
     * Field-level annotations
-* Outputs reports in CSV and JSON File formats and are available under **./result-scan-report/<jar-name>**:
+
+* Outputs reports in CSV, JSON and summary in TXT File formats. Reports are generated under `./result-scan-report/scan-report-<jar-name>/*` directory:
     * `scan-report-<jarname>.json`
     * `scan-report-<jarname>.csv`
     * `scan-report-<jarname>-summary.txt`
-
----
-## Flowchart
-
-```text
-     [ Begin  - Jar File is shared]
-                 ↓
-  Accept JAR file path in the form of arg 
-                 ↓
-        JAR file path is validated
-                 ↓
-    .class entries are loaded from JAR
-                 ↓
-   Each class is loaded through reflection
-                 ↓
-Class, Method and Field Annotations are extracted
-                 ↓
-     Summary is displayed on output
-                 ↓
-JSON and CSV File is exported. Summary of the annotations is also exported
-                 ↓
- [ Done - Summary is displayed on console]
-```
 
 ---
 
@@ -84,31 +61,30 @@ mvn clean package
 The above command will generate
 
 ```pgsql
-target/jar-annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar
+target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
+
+## Sample JAR Files For Test
+To test the code, I have shared some sample jar files under **test-jar-files/** directory.
+* JAR file with multiple annotations: `sample/target/sample-lib-1.0-SNAPSHOT.jar`
+* JAR file with empty/malformed annotations: `sample-empty/target/sample-empty-1.0-SNAPSHOT.jar`
+* JAR file with annotations in one class: `sample-annotations/target/sample-annotations-1.0-SNAPSHOT.jar`
+* JAR file with nested/partial annotations: `sample-nested/target/sample-nested-1.0-SNAPSHOT.jar`
+
 
 ## How to Run
 
-```bash 
-java -jar target/jar-annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar <path-to-your-jar>
+```pgsql 
+java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar <path-to-your-jar-file>
 ```
 
-Sample Run Scenarios for this Tool:
+### Example Run and Output
+* A Run for jar file with multiple annotations
 ```bash
 java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar ./test-jar-files/sample/target/sample-lib-1.0-SNAPSHOT.jar
 ```
-```bash
-java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar ./test-jar-files/sample-empty/target/sample-empty-1.0-SNAPSHOT.jar
-```
-```bash
-java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar ./test-jar-files/sample-annotations/target/sample-annotations-1.0-SNAPSHOT.jar
-```
-```bash
-java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar ./test-jar-files/sample-nested/target/sample-nested-1.0-SNAPSHOT.jar
-```
 
-Output Reports:
-* After running, we’ll get:
+* After running, the output reports are generated as:
 
 ```pgsql
 result-scan-report/
@@ -118,56 +94,54 @@ result-scan-report/
       └── scan-report-sample-lib-1.0-SNAPSHOT-summary.txt
 
 ```
-Each file contains a detailed mapping of annotations found in the scanned JAR in both the formats.
+The directory contains reports CSV and JSON formats, along with a summary in summary.txt.
 
 ---
 
 ## Error Handling
 
-* If invalid JAR path is provided : Tool will print user-friendly error and exits.
-* If a particular class is not getting loaded : skips the class and warning is logged.
-* If a JAR is malformed : exception handled using `IOException`.
-* If there is no annotation in the file : report is generated with the message.
+* If invalid JAR path is provided - Tool will print user-friendly error and exits.
+* If a particular class is not getting loaded - skips the class and warning is logged.
+* If a JAR is malformed - exception handled using `IOException`.
+* If there is no annotation in the file - report is generated with the message.
 
 ---
 
-## Edge Cases
-* No jar file is provided : handled gracefully.
-* Multiple jar files are provided : can be handled and steps are provided in the future scopes.
-* Malformed jar file is provided :  handled gracefully.
-* A jar file is provided with all the annotations, no annotations, nested/partial annotations.
-* A jar file is provided with method only annotations, field only annotations.
-* There are malformed annotations in the jar file : skipped gracefully and informed
+## Edge Cases Covered in The Project
+* No jar file is provided or invalid arguments are provided.
+* Malformed jar file is provided.
+* Empty jar file is provided.
+* Malformed annotations in the jar file.
+* Nested/Partial annotations in the jar file.
 
----
-
-## Sample Jar Files
-* Sample jar files are provided in test-jar-files folder 
 ---
 
 ## Future Scope
 
-* **Batch Scanning** multiple JARs in a folder.
-* Handling **Versioning** of the exports and retaining the older versions as well
-* Exporting report to frontend for better viewing.
+### 1. Multiple JAR Files scanned simultaneously
+* **Batch Scanning** multiple JARs in a folder. Multithreading can be used for parallel scanning.
+
+### 2. Maintaining Versions of same JAR Files
+* Handling **Versioning** of the exports and retaining the older versions as well by maintaining [overwrite = true/false]
+
+### 3. Interactive interface for the outputs using frontend
+* Exporting report to html or excel for better viewing.
+
+### 4. Handling Large Number of Annotations
+* For large volumes, streaming, paginated outputs, buffered I/O, or multithreading can be used to optimize class scanning.
 
 ---
 
-## Handling Large Number of Annotations
+## Test Cases Covered in the Project
 
-* For extreme volumes:
-    * Use streaming or paginated output
-    * Buffered I/O writing
-    * Use threads to parallelize scanning of classes
-
----
-
-## Test Cases Covered
-
+JUnit test cases are written in `/src/test/java/com/datastealth/AnnotationScannerTest`. Below are the covered test scenarios.
 * Test with invalid JAR path (throws exception)
 * Detect annotations from sample JAR
 * Export to JSON, CSV, Summary files correctly
 * Test empty class (no annotation)
 * Test return message in case No annotations found
 * Test malformed annotation file - testing empty files
+
 ---
+## Flowchart of the Tool
+![Flowchart.jpeg](resources/Flowchart.jpeg)
