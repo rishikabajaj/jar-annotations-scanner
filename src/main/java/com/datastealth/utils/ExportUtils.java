@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class ExportUtils {
-    // Export the result in JSON and CSV formats. Also, the summary is generated using summary.txt.
+    // Export the result in JSON and CSV formats. Also, the summary is generated
+    // using summary.txt.
     public static void exportToJson(String path, List<AnnotationScanResult> results) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);

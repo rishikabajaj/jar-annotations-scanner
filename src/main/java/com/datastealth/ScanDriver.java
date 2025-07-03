@@ -10,7 +10,8 @@ public class ScanDriver {
     public static void main(String[] args) {
         // validates that one argument (containing path of jar file) is entered.
         if (args.length != 1) {
-            System.out.println("Missing or Invalid Argument || \n Please run: java -jar annotation-inspector.jar <path-to-jar>");
+            System.out.println(
+                    "Missing or Invalid Argument || \n Please run: java -jar annotation-inspector.jar <path-to-jar>");
             return;
         }
 
@@ -23,7 +24,7 @@ public class ScanDriver {
         }
 
         try {
-            //scans jar file and returns response
+            // scans jar file and returns response
             AnnotationScanResponse response = JarAnnotationScanner.scanJar(jarPath);
             String jarName = jarFile.getName().replace(".jar", "");
             String baseOutputPath = "result-scan-report" + File.separator + jarName + File.separator + jarName;

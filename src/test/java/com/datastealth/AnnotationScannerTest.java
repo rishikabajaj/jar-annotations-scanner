@@ -32,14 +32,18 @@ public class AnnotationScannerTest {
         summaryFile = new File(REPORT_SAMPLE + "-summary.txt");
 
         File outputDir = new File("test-output");
-        if (!outputDir.exists()) outputDir.mkdirs();
+        if (!outputDir.exists())
+            outputDir.mkdirs();
     }
 
     @AfterEach
     void tearDown() {
-        if (jsonFile.exists()) jsonFile.delete();
-        if (csvFile.exists()) csvFile.delete();
-        if (summaryFile.exists()) summaryFile.delete();
+        if (jsonFile.exists())
+            jsonFile.delete();
+        if (csvFile.exists())
+            csvFile.delete();
+        if (summaryFile.exists())
+            summaryFile.delete();
     }
 
     @Test
@@ -73,8 +77,7 @@ public class AnnotationScannerTest {
                 () -> assertTrue(summaryFile.exists(), "Summary file should exist"),
                 () -> assertTrue(Files.readString(jsonFile.toPath()).contains("TestClass")),
                 () -> assertTrue(Files.readString(csvFile.toPath()).contains("testMethod")),
-                () -> assertTrue(Files.readString(summaryFile.toPath()).contains("Class Count"))
-        );
+                () -> assertTrue(Files.readString(summaryFile.toPath()).contains("Class Count")));
     }
 
     @Test
