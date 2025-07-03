@@ -3,6 +3,4 @@
 *.class
 .idea/
 *.iml
-*.jar
 result-scan-report/
-test-output/
