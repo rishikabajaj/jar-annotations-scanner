@@ -5,6 +5,7 @@ import com.datastealth.utils.ExportUtils;
 
 import java.io.File;
 
+//Reports the total counts on console and exports reports generated in csv,json format and summary in txt format
 public class AnnotationScanReporter {
     public static void printReport(AnnotationScanResponse response) {
         System.out.println("\n--- Summary ---");
@@ -19,8 +20,7 @@ public class AnnotationScanReporter {
     public static void exportReport(String baseFilePath, AnnotationScanResponse response) {
         File outputFile = new File(baseFilePath);
         File parentFile = outputFile.getParentFile();
-        // makes sure that new directory with jar file is formed only if it doesn't
-        // exist
+        // makes sure that new directory with jar file is formed only if it doesn't exist
         if (parentFile != null && !parentFile.exists()) {
             parentFile.mkdirs();
         }

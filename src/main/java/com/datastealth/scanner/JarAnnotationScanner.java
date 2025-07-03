@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+// scans the jar files for class level, method level and field level annotations
 public class JarAnnotationScanner {
     public static AnnotationScanResponse scanJar(String jarPath) {
         File jarFile = new File(jarPath);

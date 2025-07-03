@@ -6,6 +6,7 @@ import com.datastealth.scanner.JarAnnotationScanner;
 
 import java.io.File;
 
+// Drives the code by generating responses and exporting reports
 public class ScanDriver {
     public static void main(String[] args) {
         // validates that one argument (containing path of jar file) is entered.

@@ -2,6 +2,7 @@ package com.datastealth.model;
 
 import java.util.List;
 
+//creates the aggregated response from scanning a JAR file for annotations showing total counts.
 public class AnnotationScanResponse {
     private final List<AnnotationScanResult> results;
     private final int totalClasses;

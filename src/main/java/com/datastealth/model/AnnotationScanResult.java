@@ -2,6 +2,7 @@ package com.datastealth.model;
 
 import java.util.*;
 
+//Creates the annotation scan result for a single class in a JAR file.
 public class AnnotationScanResult {
     private final String className;
     private final List<String> classAnnotations = new ArrayList<>();
