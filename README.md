@@ -83,8 +83,10 @@ java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar <path
 ```bash
 java -jar target/annotation-scanner-1.0-SNAPSHOT-jar-with-dependencies.jar ./test-jar-files/sample/target/sample-lib-1.0-SNAPSHOT.jar
 ```
+* After running, console displays the summary and exports the reports in /result-scan-report
+![console-result.png](resources/console-result.png)
 
-* After running, the output reports are generated as:
+* The output reports are generated as:
 
 ```pgsql
 result-scan-report/
