@@ -25,10 +25,6 @@ public class AnnotationScanReporter {
             parentFile.mkdirs();
         }
 
-        File outDir = new File("result-scan-report");
-        if (!outDir.exists())
-            outDir.mkdirs();
-
         ExportUtils.exportToJson(baseFilePath + ".json", response.getResults());
         ExportUtils.exportToCsv(baseFilePath + ".csv", response.getResults());
         ExportUtils.exportSummary(baseFilePath + "-summary.txt", response);

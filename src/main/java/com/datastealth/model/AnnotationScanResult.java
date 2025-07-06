@@ -13,6 +13,7 @@ public class AnnotationScanResult {
         this.className = className;
     }
 
+    //getters
     public String getClassName() { return className; }
 
     public List<String> getClassAnnotations() { return classAnnotations; }
@@ -21,6 +22,7 @@ public class AnnotationScanResult {
 
     public Map<String, List<String>> getFieldAnnotations() { return fieldAnnotations; }
 
+    //adders instead of setters to preserve the current state and add annotations
     public void addClassAnnotation(String annotation) {
         classAnnotations.add(annotation);
     }
