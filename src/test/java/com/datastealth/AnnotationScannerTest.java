@@ -1,10 +1,13 @@
 package com.datastealth;
 
+import com.datastealth.model.AnnotationScanResponseBuilder;
 import com.datastealth.model.AnnotationScanResult;
 import com.datastealth.model.AnnotationScanResponse;
 import com.datastealth.reporter.AnnotationScanReporter;
 import com.datastealth.scanner.JarAnnotationScanner;
 
+import com.datastealth.service.AnnotationScanService;
+import com.datastealth.service.impl.AnnotationScanServiceImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -24,6 +27,13 @@ public class AnnotationScannerTest {
     private File jsonFile;
     private File csvFile;
     private File summaryFile;
+
+    private JarAnnotationScanner scanner;
+
+    @BeforeAll
+    void setupScanner() {
+        scanner = new JarAnnotationScanner(new AnnotationScanServiceImpl());
+    }
 
     @BeforeEach
     void setUp() {
@@ -50,7 +60,7 @@ public class AnnotationScannerTest {
     @DisplayName("1. Should throw error for invalid JAR path")
     void testInvalidJarPath() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            JarAnnotationScanner.scanJar("non-existent.jar");
+            scanner.scanJar("non-existent.jar");
         });
         assertTrue(exception.getMessage().contains("JAR file does not exist"));
     }
@@ -58,7 +68,7 @@ public class AnnotationScannerTest {
     @Test
     @DisplayName("2. Should detect annotations from sample JAR")
     void testScanSampleJar() {
-        AnnotationScanResponse response = JarAnnotationScanner.scanJar(SAMPLE_JAR_PATH);
+        AnnotationScanResponse response = scanner.scanJar(SAMPLE_JAR_PATH);
         assertNotNull(response);
         assertFalse(response.isEmpty());
         assertTrue(response.getTotalClasses() > 0);
@@ -68,7 +78,7 @@ public class AnnotationScannerTest {
     @DisplayName("3. Should export JSON, CSV, Summary files correctly")
     void testExportingResults() throws IOException {
         List<AnnotationScanResult> results = mockResults();
-        AnnotationScanResponse response = new AnnotationScanResponse(results);
+        AnnotationScanResponse response = AnnotationScanResponseBuilder.build(results);
         AnnotationScanReporter.exportReport(REPORT_SAMPLE, response);
 
         assertAll(
@@ -87,6 +97,18 @@ public class AnnotationScannerTest {
         assertFalse(result.hasAnnotations());
     }
 
+    @Test
+    @DisplayName("5. Should return message: No annotations found")
+    void testNoAnnotationsMessage() {
+        List<AnnotationScanResult> emptyResults = new ArrayList<>();
+        AnnotationScanResponse response = AnnotationScanResponseBuilder.build(emptyResults);
+
+        assertEquals("0 annotations found in the shared jar file", response.getMessage());
+        assertEquals(0, response.getTotalClassAnnotations());
+        assertEquals(0, response.getTotalMethodAnnotations());
+        assertEquals(0, response.getTotalFieldAnnotations());
+    }
+
     private List<AnnotationScanResult> mockResults() {
         AnnotationScanResult result = new AnnotationScanResult("TestClass");
         result.addClassAnnotation("@Deprecated");
@@ -96,17 +118,5 @@ public class AnnotationScannerTest {
         List<AnnotationScanResult> results = new ArrayList<>();
         results.add(result);
         return results;
-    }
-
-    @Test
-    @DisplayName("5. Should return message: No annotations found")
-    void testNoAnnotationsMessage() {
-        List<AnnotationScanResult> emptyResults = new ArrayList<>();
-        AnnotationScanResponse response = new AnnotationScanResponse(emptyResults);
-
-        assertEquals("0 annotations found in the shared jar file", response.getMessage());
-        assertEquals(0, response.getTotalClassAnnotations());
-        assertEquals(0, response.getTotalMethodAnnotations());
-        assertEquals(0, response.getTotalFieldAnnotations());
     }
 }

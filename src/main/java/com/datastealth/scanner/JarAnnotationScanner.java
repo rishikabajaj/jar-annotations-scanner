@@ -1,13 +1,15 @@
 package com.datastealth.scanner;
 
+import com.datastealth.model.AnnotationScanResponseBuilder;
 import com.datastealth.model.AnnotationScanResult;
 import com.datastealth.model.AnnotationScanResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+
+import com.datastealth.service.AnnotationScanService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -16,7 +18,15 @@ import java.util.jar.JarFile;
 
 // scans the jar files for class level, method level and field level annotations
 public class JarAnnotationScanner {
-    public static AnnotationScanResponse scanJar(String jarPath) {
+    private static final Logger logger = LoggerFactory.getLogger(JarAnnotationScanner.class);
+    private final AnnotationScanService scanService;
+
+    public JarAnnotationScanner(AnnotationScanService scanService) {
+        this.scanService = scanService;
+    }
+
+    public AnnotationScanResponse scanJar(String jarPath) {
+
         File jarFile = new File(jarPath);
         if (!jarFile.exists()) {
             throw new IllegalArgumentException("JAR file does not exist: " + jarPath);
@@ -29,46 +39,23 @@ public class JarAnnotationScanner {
                 URLClassLoader loader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()});
                 JarFile jar = new JarFile(jarFile)
         ) {
-            Enumeration<JarEntry> entries = jar.entries();
+            List<JarEntry> classEntries = Collections.list(jar.entries()).stream()
+                    .filter(e -> e.getName().endsWith(".class"))
+                    .toList();
 
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                if (!entry.getName().endsWith(".class")) continue;
+            logger.info("Starting annotation scan on {} classes", classEntries.size());
 
+            for (JarEntry entry : classEntries) {
                 String className = entry.getName().replace("/", ".").replace(".class", "");
                 try {
                     Class<?> loadedClass = loader.loadClass(className);
-                    AnnotationScanResult result = new AnnotationScanResult(className);
-
-                    for (Annotation annotation : loadedClass.getAnnotations()) {
-                        result.addClassAnnotation(annotation.annotationType().getName());
-                    }
-
-                    for (Method method : loadedClass.getDeclaredMethods()) {
-                        List<String> methodAnnotations = new ArrayList<>();
-                        for (Annotation annotation : method.getAnnotations()) {
-                            methodAnnotations.add(annotation.annotationType().getName());
-                        }
-                        if (!methodAnnotations.isEmpty()) {
-                            result.addMethodAnnotations(method.getName(), methodAnnotations);
-                        }
-                    }
-
-                    for (Field field : loadedClass.getDeclaredFields()) {
-                        List<String> fieldAnnos = new ArrayList<>();
-                        for (Annotation annotation : field.getAnnotations()) {
-                            fieldAnnos.add(annotation.annotationType().getName());
-                        }
-                        if (!fieldAnnos.isEmpty()) {
-                            result.addFieldAnnotations(field.getName(), fieldAnnos);
-                        }
-                    }
+                    AnnotationScanResult result = scanService.scanClass(loadedClass);
 
                     if (result.hasAnnotations()) {
                         results.add(result);
                     }
                 } catch (Throwable e) {
-                    System.err.println("Skipping class: " + className + " due to error: " + e.getMessage());
+                    logger.warn("Skipping class: {} due to error: {}", className, e.getMessage());
                 }
             }
 
@@ -76,6 +63,6 @@ public class JarAnnotationScanner {
             throw new RuntimeException("Failed to scan JAR: " + e.getMessage());
         }
 
-        return new AnnotationScanResponse(results);
+        return AnnotationScanResponseBuilder.build(results);
     }
 }

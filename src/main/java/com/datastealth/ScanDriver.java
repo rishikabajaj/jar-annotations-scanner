@@ -3,6 +3,8 @@ package com.datastealth;
 import com.datastealth.model.AnnotationScanResponse;
 import com.datastealth.reporter.AnnotationScanReporter;
 import com.datastealth.scanner.JarAnnotationScanner;
+import com.datastealth.service.AnnotationScanService;
+import com.datastealth.service.impl.AnnotationScanServiceImpl;
 
 import java.io.File;
 
@@ -25,8 +27,12 @@ public class ScanDriver {
         }
 
         try {
+            // instantiate service and scanner
+            AnnotationScanService scanService = new AnnotationScanServiceImpl();
+            JarAnnotationScanner scanner = new JarAnnotationScanner(scanService);
+
             // scans jar file and returns response
-            AnnotationScanResponse response = JarAnnotationScanner.scanJar(jarPath);
+            AnnotationScanResponse response = scanner.scanJar(jarPath);
             String jarName = jarFile.getName().replace(".jar", "");
             String baseOutputPath = "result-scan-report" + File.separator + jarName + File.separator + jarName;
 

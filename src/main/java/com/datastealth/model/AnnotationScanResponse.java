@@ -11,26 +11,18 @@ public class AnnotationScanResponse {
     private final int totalFieldAnnotations;
     private final String message;
 
-    public AnnotationScanResponse(List<AnnotationScanResult> results) {
+    public AnnotationScanResponse(List<AnnotationScanResult> results,
+                                  int totalClasses,
+                                  int totalClassAnnotations,
+                                  int totalMethodAnnotations,
+                                  int totalFieldAnnotations,
+                                  String message) {
         this.results = results;
-        this.totalClasses = results.size();
-        this.totalClassAnnotations = results.stream()
-                .mapToInt(r -> r.getClassAnnotations().size())
-                .sum();
-        this.totalMethodAnnotations = results.stream()
-                .mapToInt(r -> r.getMethodAnnotations().values().stream().mapToInt(List::size).sum())
-                .sum();
-        this.totalFieldAnnotations = results.stream()
-                .mapToInt(r -> r.getFieldAnnotations().values().stream().mapToInt(List::size).sum())
-                .sum();
-
-        int totalAnnotations = totalClassAnnotations + totalMethodAnnotations + totalFieldAnnotations;
-
-        if (totalAnnotations == 0) {
-            this.message = "0 annotations found in the shared jar file";
-        } else {
-            this.message = totalAnnotations + " annotations found in the shared jar file";
-        }
+        this.totalClasses = totalClasses;
+        this.totalClassAnnotations = totalClassAnnotations;
+        this.totalMethodAnnotations = totalMethodAnnotations;
+        this.totalFieldAnnotations = totalFieldAnnotations;
+        this.message = message;
     }
 
     public List<AnnotationScanResult> getResults() {
@@ -60,4 +52,5 @@ public class AnnotationScanResponse {
     public String getMessage() {
         return message;
     }
+
 }
